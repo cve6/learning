@@ -11,6 +11,14 @@ dpink='\e[35m'
 pink='\e[95m'
 white='\e[1;37m'
 
+#######---- is root?
+if [[ $EUID -ne 0 ]]; then
+clear
+echo -e "${red}\n\t[ ⛌ ] Need root. ${reset}\n"
+sleep 1
+exit 0
+fi
+
 #######---- functions
 ##-- passive recon
 passive(){
@@ -38,11 +46,22 @@ passive(){
     read -p "         ❯ Press Enter..."
 }
 
-##-- active recon (i will do)
-#active(){
+##-- active recon (i did moreless)
+active(){
+    clear
+    echo -e "\n\n\t${hardyellow}Recommended format: ${sublin}vulnweb.com${reset}"
+    read -p "        ✱ Website Adress: " website
+    clear
+    echo -e "\n\n\t ${greenlight}${sublin}✸ nmap RESULTS | "$website" ✸${reset}\n\n"
+    sudo nmap -sS -Pn -n --top-ports 3000 --max-rate 400 --max-retries 1 -sV --version-light "$website"
+    #sudo nmap -sS -p- -Pn -n -T4 --min-rate 1000 --max-retries 2 -sV --version-intensity 5 "$website" #active if you want
+    echo -e "\n\n\t ${greenlight}${sublin}✸ traceroute RESULTS | "$website" ✸${reset}\n\n"
+    traceroute -n -m 30 -w 2 -q 1 "$website" | awk 'NR>1 {print $0}'    
+    echo -e "\n"
+    read -p "         ❯ Press Enter..."
+}
 
-#}
-
+##-- fingerprint (i will do)
 
 #main (bruh)
 main(){
@@ -54,7 +73,7 @@ echo -e "\n\n                          ${yellow}☻${reset}${pink}
 \t\t█     █ ██ ▄  ▀▀▀▀▄       █    █▄▄█ 
 \t\t █    █ ▐█  ▀▄▄▄▄▀       █     █  █ 
 \t\t  █  █   ▐              ▄▀         █ 
-\t\t   █▐      ⛧   by cve6            █  
+\t\t   █▐        ⛧  by cve6           █  
 \t\t   ▐                              ▀\n\n${reset}"
 echo -e "\t\t ${red}❥${reset} ${white}1. Passive Recon${reset}"
 echo -e "\t\t ${red}❥${reset} ${white}2. Active Recon${reset}"
@@ -66,6 +85,7 @@ case "$opt" in
 passive
 ;;
 2)
+active
 ;;
 3)
 ;;
@@ -80,5 +100,6 @@ sleep 2
 esac
 done
 }
+
 #call the main function
 main
